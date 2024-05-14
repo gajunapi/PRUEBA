@@ -1,0 +1,65 @@
+PREVIOS CAMBIOS
+--------
+
+ELBS: 
+
+https://bagr-prod-did-adm-dmc.tfp.appgate.com/detect/
+
+https://bagr-prod-did-adm-dmc.tfp.appgate.com/detect/services
+
+Nodo 1
+
+https://10.13.97.42:443/detect
+
+https://10.13.97.42:443/detect/services
+
+Nodo 2 
+
+
+https://10.13.97.179:443/detect
+
+https://10.13.97.179:443/detect/services
+
+
+systemctl enable detectid.service
+
+systemctl stop detectid.service
+
+systemctl start detectid.service
+
+
+tail -f /data/DetectID/application/logs/catalina.out
+
+
+tail -f /data/DetectID/application/logs/soap.log
+
+bagr-prod-did-int-api.tfp.appgate.com.jks
+bagr-prod-did-int-api.tfp.appgate.com.jks*
+
+*********************COMPRIMIR - DESCOMPRIMIR******************************
+Comprimir: tar -czvf DetectID.tar.gz DetectID/
+Descomprimir: tar -xzvf DetectID.tar.gz
+
+Comprimir excluiyendo: tar --exclude='rutaarchivo a excluir' -zcvf archivocomprimido.tar.gz archivoacomprimir/
+tar --exclude='DetectID/application/logs/' -zcvf DetectID.tar.gz DetectID/
+
+
+
+********************ARCHIVOS A MODIFICAR DID***********************************
+
+vim /data/DetectID/application/conf/detectid-server-environment.properties
+vim /data/DetectID/application/webapps/detect/WEB-INF/configuration.properties
+vim /data/DetectID/application/webapps/microservices/channels-service/WEB-INF/classes/application.yml
+vim /data/DetectID/application/webapps/microservices/clients-service/WEB-INF/classes/application.yml
+vim /data/DetectID/application/webapps/microservices/encryption-service/WEB-INF/classes/application.yml
+vim /data/DetectID/application/webapps/microservices/mobile-auth-service/WEB-INF/classes/application.yml
+vim /data/DetectID/application/webapps/microservices/oob-service/WEB-INF/classes/application.yml
+vim /data/DetectID/application/webapps/microservices/session-service/WEB-INF/classes/application.yml
+vim /data/DetectID/application/webapps/microservices/tokens-service/WEB-INF/classes/application.yml 
+vim /data/DetectID/application/webapps/microservices/oath-service/WEB-INF/classes/application.yml -> en prod esta la misma ip y en los otros ambientes: localhost
+
+********************************************************************************
+
+***********************VERIFICAR CERTIFICADO************************************
+keytool -v -list -keystore bco-did-dev.tfp.appgate.com.jks -> el password esta en el archivo: /data/DetectID/application/conf/detectid-server-environment.properties
+
