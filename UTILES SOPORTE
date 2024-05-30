@@ -1,25 +1,36 @@
+<------------------BUSQUEDA EN LOG CON FILTRO---------------------------------
+cat /data/DetectID/application/logs/soap.log | grep -A 10 -B 10 BD15008765478
+
+Query para extraer la información de los clientes con su respectivo canal.
+SELECT cli_description AS "Bussiness Identifier", COUNT(*) AS "Clientes" FROM client GROUP BY cli_description ORDER BY "Clientes" DESC ;
+
 PREVIOS CAMBIOS
 --------
 
 ELBS: 
 
-https://bagr-prod-did-adm-dmc.tfp.appgate.com/detect/
+https://bco-did-pro-ilb.tfp.appgate.com/detect/
 
-https://bagr-prod-did-adm-dmc.tfp.appgate.com/detect/services
+https://bco-did-pro-ilb.tfp.appgate.com/detect/services
 
 Nodo 1
 
-https://10.13.97.42:443/detect
+https://172.34.0.229:443/detect
 
-https://10.13.97.42:443/detect/services
+https://172.34.0.229:443/detect/services
 
 Nodo 2 
 
 
-https://10.13.97.179:443/detect
+https://172.34.0.135:443/detect
 
-https://10.13.97.179:443/detect/services
+https://172.34.0.135:443/detect/services
 
+Nodo 3
+
+https://172.34.0.188:443/detect
+
+https://172.34.0.188:443/detect/services
 
 systemctl enable detectid.service
 
@@ -42,8 +53,10 @@ Descomprimir: tar -xzvf DetectID.tar.gz
 
 Comprimir excluiyendo: tar --exclude='rutaarchivo a excluir' -zcvf archivocomprimido.tar.gz archivoacomprimir/
 tar --exclude='DetectID/application/logs/' -zcvf DetectID.tar.gz DetectID/
+tar --exclude='/data/DetectID/application/logs/' -zcvf DetectID.tar.gz DetectID/
 
-
+DTA: tar --exclude='/data/DetectTA/detectta-server/logs' -zcvf DetectTA.tar.gz /data/DetectTA
+DID: tar --exclude='/data/DetectID/application/logs' -zcvf DetectID.tar.gz /data/DetectID
 
 ********************ARCHIVOS A MODIFICAR DID***********************************
 
@@ -57,9 +70,180 @@ vim /data/DetectID/application/webapps/microservices/oob-service/WEB-INF/classes
 vim /data/DetectID/application/webapps/microservices/session-service/WEB-INF/classes/application.yml
 vim /data/DetectID/application/webapps/microservices/tokens-service/WEB-INF/classes/application.yml 
 vim /data/DetectID/application/webapps/microservices/oath-service/WEB-INF/classes/application.yml -> en prod esta la misma ip y en los otros ambientes: localhost
-
+(NEQUI) archivo messagin-> para hcer uso del servicio se debe configurar el archivo: /data/DetectID/application/webapps/detect/WEB-INF/classes/did-oob-messaging-plugin.properties
 ********************************************************************************
 
 ***********************VERIFICAR CERTIFICADO************************************
 keytool -v -list -keystore bco-did-dev.tfp.appgate.com.jks -> el password esta en el archivo: /data/DetectID/application/conf/detectid-server-environment.properties
 
+***********************************************COPIAR ENTRE MAQUINAS**************************************************
+
+scp archivo.tar.gz gabriel.navarro@10.13.96.58:/home/gabriel.navarro/
+
+ZXagevrOQnT9Mk5ew+m/E+Pv2eaEvkfJarhwvrClBFo=
+ZXagevrOQnT9Mk5ew+m/E+Pv2eaEvkfJarhwvrClBFo=
+ZXagevrOQnT9Mk5ew+m/E+Pv2eaEvkfJarhwvrClBFo=
+
+ tail -f /data/DetectID/application/logs/catalina.out
+ tail -f /data/DetectID/application/logs/soap.log
+
+
+ sudo systemctl start detectid.service
+
+ sudo systemctl stop detectid.service
+
+sudo systemctl start detectid.service ; tail -f /data/DetectID/application/logs/catalina.out
+
+
+
+
+*************************ARCHIVOS A MODIFICAR DTA********************
+
+                       CORE 
+vim 1.eureka-web-console/application.yml
+vim 1.eureka-web-console/appgate-eureka-web-console.service
+vim 2.api-gateway/application.yml
+vim 2.api-gateway/appgate-api-gateway.service
+vim 3.authorization-service/application.yml
+vim 3.authorization-service/appgate-authorization-service.service
+vim 4.authentication-service/application.yml
+vim 4.authentication-service/appgate-authentication-service.service
+vim 5.cwc-gateway/application.yml
+vim 5.cwc-gateway/appgate-cwc-gateway.service
+vim 6.cwc-authentication/application.yml
+vim 6.cwc-authentication/appgate-cwc-authentication.service
+vim 7.cwc-authorization/application.yml
+vim 7.cwc-authorization/appgate-cwc-authorization.service
+vim 8.audit-service/application.properties
+vim 8.audit-service/appgate-rba-audit.service
+vim 9.cwc-audit/appgate-cwc-audit.service
+
+                  DTA
+
+dta
+vim 1.evaluation/appgate-dta-evaluation.service
+vim 1.evaluation/application.yml
+vim 2.case-management/appgate-dta-casemgmt.service
+vim 2.case-management/application.yml
+vim 3.real-time/appgate-dta-realtime.service
+vim 3.real-time/application.yml
+vim 4.reports/appgate-dta-reports.service
+vim 4.reports/application.yml
+
+vim /data/DetectTA/detectta-server/webapps/easyboard/WEB-INF/configuration.properties
+vim /data/DetectTA/detectta-server/webapps/detectta/WEB-INF/configuration.properties
+vim /data/DetectTA/detectta-server/conf/server.xml
+vim /data/DetectTA/detectta-server/bin/setenv.sh
+vim /data/DetectTA/detectta-server/webapps/detectta/WEB-INF/ehcache.properties
+vim /data/DetectTA/detectta-learning/webapps/detectta-learning-engine/WEB-INF/configuration.properties
+ 
+vim /data/DetectTA/detectta-server/bin/detectta-server.service
+ /usr/lib/jvm/
+cache en LE
+vim /data/DetectTA/detectta-learning/webapps/detectta-learning-engine/WEB-INF/ehcache.properties
+ Para los clientes con saml
+vim /data/DetectTA/detectta-server/webapps/saml-sp-service/WEB-INF/classes/application.yml
+ 
+Se encuentre en nombre de la metadata que tiene configurado en el application:   vim /data/DetectTA/webconsole/core/4.authentication-service/application.yml
+
+verificar certificado: vim webconsole/core/2.api-gateway/application.yml
+vim /data/DetectTA/detectta-server/conf/detectta-environment.properties
+
+
+sudo systemctl stop appgate-*
+
+sudo systemctl stop detectta-server.service
+sudo systemctl start detectta-server.service
+
+sudo systemctl stop detectta-learning.service
+sudo systemctl start detectta-learning.service
+
+**ORDEN DE INICIO DE SERVICIO EN DTA**
+Micro servicios /core
+1 - sudo systemctl start appgate-eureka-web-console.service
+2 - sudo systemctl start appgate-api-gateway.service
+3 - sudo systemctl start appgate-authorization-service.service
+4 - sudo systemctl start appgate-authentication-service.service
+5 - sudo systemctl start appgate-cwc-gateway.service
+6 - sudo systemctl start appgate-cwc-authentication.service
+7 - sudo systemctl start appgate-cwc-authorization.service
+8 - sudo systemctl start appgate-rba-audit.service - no se evidencia en la consola
+9 - sudo systemctl start appgate-cwc-audit.service
+
+Micro servicios /dta
+10 - sudo systemctl start appgate-dta-evaluation.service
+11 - sudo systemctl start appgate-dta-casemgmt.service
+12 - sudo systemctl start appgate-dta-realtime.service
+13 - sudo systemctl start appgate-dta-reports.service
+
+Por ultimo se ejecutan los contenedores tomcat
+14 - sudo systemctul start detectta-server.service
+15 - sudo systemctl start detectta-learning.service
+
+
+Verificar eureka
+ip:8761
+
+
+
+
+
+/data/certs/bco-mandela-dr.tfp.appgate.com.jks
+
+219J5Y2dGe0zxo/0xQlWfugoR5LijsCcR91NMhAkLWY=
+# consultar campos
+
+•consultar general: se puede observar todos los parámetros
+        select * from conf_advanced;  
+•consulta los campos y que valor se tiene en el momento de la consulta
+select * from conf_advanced where ca_identifier in ('le.rest.prefix.host','authorization.host','audit.service.host','authentication.host');
+
+
+# Cambiar el campo IP por la dirección IP correspondiente
+
+UPDATE
+        conf_advanced
+SET     ca_value = '10.1.47.97'
+WHERE   ca_identifier = 'le.rest.prefix.host';
+
+UPDATE
+        conf_advanced
+SET     ca_value = '10.1.47.97'
+WHERE   ca_identifier = 'authorization.host';
+
+UPDATE
+        conf_advanced
+SET     ca_value = '10.1.47.97'
+WHERE   ca_identifier = 'audit.service.host';
+
+UPDATE
+        conf_advanced
+SET     ca_value = '10.1.47.97'
+WHERE   ca_identifier = 'authentication.host';
+
+
+Balanceador
+https://pc-dev-dta.tfp.appgate.com:8888/cwc-authentication/user-login?context=cwc-authentication
+https://pc-dev-dta.tfp.appgate.com/detectta/
+https://pc-dev-dta.tfp.appgate.com/detectta/webservices
+
+Nodo1
+https://10.1.47.97/detectta
+https://10.1.47.97/detectta/webservices
+https://10.1.47.97:8888/ -> consola web
+
+
+Nodo3 LE - eureka
+
+http://10.1.47.97:8761/
+
+
+keytool -v -list -keystore
+
+--------------
+
+nohup sh nombredelSH &
+
+nohup sh Vaccum_Nequi.sh &
+
+sh Truncate_Alert_Messages.sh &
